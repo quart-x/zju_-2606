@@ -1,4 +1,40 @@
 'use strict';
+// Motion enhances the page without changing journal data or storage.
+function initMotion() {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const toggle = document.createElement('button');
+  toggle.className = 'text-button motion-toggle';
+  toggle.type = 'button';
+  let paused = reduced.matches;
+  const apply = () => {
+    document.documentElement.classList.toggle('motion-paused', paused);
+    toggle.textContent = paused ? '播放动效 ◷' : '暂停动效 ◷';
+    toggle.setAttribute('aria-pressed', String(paused));
+    if (paused) document.querySelectorAll('.reveal-pending').forEach(el => el.classList.remove('reveal-pending'));
+  };
+  toggle.addEventListener('click', () => { paused = !paused; apply(); });
+  reduced.addEventListener('change', () => { paused = reduced.matches; apply(); });
+  document.querySelector('footer').append(toggle);
+  apply();
+  if (!paused && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(items => {
+      for (const item of items) if (item.isIntersecting) {
+        item.target.classList.remove('reveal-pending');
+        item.target.classList.add('revealed');
+        observer.unobserve(item.target);
+      }
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.section-head, .tools, .closing').forEach(el => {
+      // Keep above-the-fold content and keyboard focus accessible immediately.
+      if (el.getBoundingClientRect().top >= window.innerHeight) {
+        el.classList.add('reveal-pending');
+        el.addEventListener('focusin', () => el.classList.remove('reveal-pending'), { once: true });
+        observer.observe(el);
+      }
+    });
+  }
+}
+document.addEventListener('DOMContentLoaded', initMotion, { once: true });
 const $ = (s) => document.querySelector(s);
 const KEY = 'zhichuang2606-drafts-v1';
 const categories = ['班级日常', '班级活动', '成长瞬间'];
