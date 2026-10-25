@@ -105,4 +105,28 @@
   paginate('#entries',4);paginate('#gallery',6);
   document.documentElement.classList.add('book-ready');
   turn(target(),true);
+
+  // Decorative opening cover never blocks links, keyboard focus or saved content.
+  function openNotebook() {
+    if (noMotion()) return;
+    const cover = document.createElement('div');
+    cover.className = 'book-opening-cover'; cover.setAttribute('aria-hidden', 'true');
+    const title = document.createElement('strong'), subtitle = document.createElement('span');
+    title.textContent = '智创2606 · 班级手账';
+    subtitle.textContent = '翻开今天，收藏我们的故事';
+    cover.append(title, subtitle); main.append(cover); main.classList.add('book-entering');
+    let timer;
+    function finish() {
+      cover.remove(); main.classList.remove('book-entering'); clearTimeout(timer);
+      document.removeEventListener('pointerdown', finish);
+      document.removeEventListener('keydown', finish);
+      reduced.removeEventListener('change', finish);
+    }
+    cover.addEventListener('animationend', finish, { once: true });
+    document.addEventListener('pointerdown', finish, { once: true });
+    document.addEventListener('keydown', finish, { once: true });
+    reduced.addEventListener('change', finish, { once: true });
+    timer = setTimeout(finish, 1900);
+  }
+  openNotebook();
 })();
