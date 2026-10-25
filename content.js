@@ -3,7 +3,7 @@ window.CLASS_LOG = {
   "entries": [
     {
       "id": "93b10b28-87d2-469e-9ee6-5d120cae42fc",
-      "title": "test",
+      "title": "test23232321232323",
       "date": "2026-10-25",
       "category": "班级日常",
       "author": "",
